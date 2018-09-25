@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Buffers.Text;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using Yakbak.Middleware.Extensions;
 
 namespace Yakbak.Middleware

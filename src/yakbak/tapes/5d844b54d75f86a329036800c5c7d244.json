@@ -1,0 +1,62 @@
+{
+  "StatusCode": 200,
+  "Headers": [
+    {
+      "Key": "Cache-Control",
+      "Value": "no-store, must-revalidate, no-cache"
+    },
+    {
+      "Key": "Connection",
+      "Value": "keep-alive"
+    },
+    {
+      "Key": "Date",
+      "Value": "Tue, 25 Sep 2018 20:49:57 GMT"
+    },
+    {
+      "Key": "Pragma",
+      "Value": "no-cache"
+    },
+    {
+      "Key": "Content-Type",
+      "Value": "text/plain; charset=UTF-8"
+    },
+    {
+      "Key": "Expires",
+      "Value": "Thu, 19 Nov 1981 08:52:00 GMT"
+    },
+    {
+      "Key": "Server",
+      "Value": "cloudflare"
+    },
+    {
+      "Key": "Set-Cookie",
+      "Value": "__cfduid=db1ce20bd1d5a334f8916688ee9ad28031537908596; expires=Wed, 25-Sep-19 20:49:56 GMT; path=/; domain=.random.org; HttpOnly,RDOSESSION=mqqcd58callcolodsh3m7cv5c1; path=/; domain=.random.org,__cflb=769728044; path=/; expires=Wed, 26-Sep-18 19:49:57 GMT"
+    },
+    {
+      "Key": "Access-Control-Allow-Headers",
+      "Value": "Origin, X-Requested-With, Content-Type, Accept"
+    },
+    {
+      "Key": "Access-Control-Allow-Origin",
+      "Value": "*"
+    },
+    {
+      "Key": "Content-Length",
+      "Value": "9"
+    },
+    {
+      "Key": "RDO-Authenticated-Login",
+      "Value": "-"
+    },
+    {
+      "Key": "Expect-CT",
+      "Value": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\""
+    },
+    {
+      "Key": "CF-RAY",
+      "Value": "46005c3b081834a0-LHR"
+    }
+  ],
+  "Base64Body": "SlBEaXNNVGkK"
+}

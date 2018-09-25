@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace Yakbak
+namespace Yakbak.Middleware.Extensions
 {
-    public static class YakbakServerExtensions
+    public static class ProxyExtensions
     {
         public static HttpRequestMessage CreateProxyHttpRequest(this HttpContext context, Uri uri)
         {
@@ -27,8 +26,7 @@ namespace Yakbak
             // Copy the request headers
             foreach (var header in request.Headers)
             {
-                if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()) && 
-                    requestMessage.Content != null)
+                if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()))
                 {
                     requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
                 }
@@ -68,7 +66,7 @@ namespace Yakbak
                 throw new ArgumentNullException(nameof(requestMessage));
             }
 
-            var client = new HttpClient(new HttpClientHandler {AllowAutoRedirect = false, UseCookies = false});
+            var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
             return client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
         }
 
@@ -102,14 +100,6 @@ namespace Yakbak
             }
         }
 
-        public static void UseYakbak(this IApplicationBuilder app, YakbakOptions options = null)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
 
-            app.UseMiddleware<YakbakMiddleware>(options ?? new YakbakOptions());
-        }
     }
 }

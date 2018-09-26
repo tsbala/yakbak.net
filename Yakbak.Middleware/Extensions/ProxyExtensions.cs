@@ -99,7 +99,5 @@ namespace Yakbak.Middleware.Extensions
                 await responseStream.CopyToAsync(response.Body, streamCopyBufferSize, context.RequestAborted);
             }
         }
-
-
     }
 }

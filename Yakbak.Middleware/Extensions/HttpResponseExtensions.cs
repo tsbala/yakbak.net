@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -11,17 +12,23 @@ namespace Yakbak.Middleware.Extensions
 {
     public static class HttpResponseExtensions
     {
-        public static void SaveToTape(this HttpResponse response, string tapeName)
+        public static async Task SaveToTape(this HttpResponseMessage response, string tapeName)
         {
             var tapedResponse = new TapeResponse
             {
                 Headers = response.Headers
-                                  .Select(x => new KeyValuePair<string, string>(x.Key, x.Value.ToString()))
+                                  .Select(x => new KeyValuePair<string, string>(x.Key, string.Join(',', x.Value)))
                                   .ToArray(),
-                StatusCode = response.StatusCode
+                StatusCode = (int)response.StatusCode
             };
-            var bytes = response.Body.ReadAllBytes();
-            tapedResponse.Base64Body = Convert.ToBase64String(bytes);
+
+            using (var buffer = new MemoryStream())
+            using (var responseStream = await response.Content.ReadAsStreamAsync())
+            {
+                await responseStream.CopyToAsync(buffer);
+                var bytes = buffer.ReadAllBytes();
+                tapedResponse.Base64Body = Convert.ToBase64String(bytes);
+            }
 
             var directory = Path.GetDirectoryName(tapeName);
             Directory.CreateDirectory(directory);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -24,12 +25,20 @@ namespace Yakbak.Middleware
         {
             if (_options.TapesDirectory == null)
             {
-                throw new Exception("Value for tapes directory must be supplied");
+                throw new ArgumentNullException("TapesDirectory", "Value for tapes directory must be supplied");
             }
 
-            var hash = context.Request.Hash();
+            if (_options.Uri == null)
+            {
+                throw new ArgumentNullException("Uri", "Value for Uri must be supplied");
+            }
+
+            var proxyRequest = context.CreateProxyHttpRequest(_options.Uri);
+            var hash = await proxyRequest.Hash(_logger);
+
             var tapename = Path.Combine(_options.TapesDirectory, $"{hash}.json");
             _logger.LogInformation($"tapename is {tapename}");
+
             if (File.Exists(tapename))
             {
                 _logger.LogInformation($"tapename {tapename} exists");
@@ -38,20 +47,21 @@ namespace Yakbak.Middleware
             else
             {
                 _logger.LogInformation($"tapename {tapename} does not exist, proxying request and saving to tape");
-                await ProxyRequestAndRecordResponse(context, tapename);
+                await ProxyRequestAndRecordResponse(context, proxyRequest, tapename);
             }
         }
 
-        private async Task ProxyRequestAndRecordResponse(HttpContext context, string tapename)
+        private async Task ProxyRequestAndRecordResponse(HttpContext context, HttpRequestMessage request, string tapename)
         {
             using (var buffer = new MemoryStream())
             {
                 var stream = context.Response.Body;
                 context.Response.Body = buffer;
-
-                await context.ProxyRequest(_options.Uri);
-                context.Response.SaveToTape(tapename);
-
+                using (var responseMessage = await context.SendProxyHttpRequest(request))
+                {
+                    await responseMessage.SaveToTape(tapename);
+                    await context.CopyProxyHttpResponse(responseMessage);
+                }
                 buffer.Seek(0, SeekOrigin.Begin);
                 await buffer.CopyToAsync(stream);
                 context.Response.Body = stream;

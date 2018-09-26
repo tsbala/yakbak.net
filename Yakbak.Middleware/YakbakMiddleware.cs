@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Yakbak.Middleware.Extensions;
 
 namespace Yakbak.Middleware
@@ -9,11 +10,13 @@ namespace Yakbak.Middleware
     public class YakbakMiddleware
     {
         private readonly YakbakOptions _options;
+        private readonly ILogger<YakbakMiddleware> _logger;
         private readonly RequestDelegate _next;
 
-        public YakbakMiddleware(YakbakOptions options, RequestDelegate next)
+        public YakbakMiddleware(YakbakOptions options, ILogger<YakbakMiddleware> logger, RequestDelegate next)
         {
             _options = options;
+            _logger = logger;
             _next = next;
         }
 
@@ -26,12 +29,15 @@ namespace Yakbak.Middleware
 
             var hash = context.Request.Hash();
             var tapename = Path.Combine(_options.TapesDirectory, $"{hash}.json");
+            _logger.LogInformation($"tapename is {tapename}");
             if (File.Exists(tapename))
             {
+                _logger.LogInformation($"tapename {tapename} exists");
                 await context.Response.RenderFromTape(tapename);
             }
             else
             {
+                _logger.LogInformation($"tapename {tapename} does not exist, proxying request and saving to tape");
                 await ProxyRequestAndRecordResponse(context, tapename);
             }
         }

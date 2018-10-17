@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yakbak.Web", "src\yakbak\Yakbak.Web.csproj", "{75E0B9C0-8283-4724-B2E4-C6B5DBD7632E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yakbak.Middleware", "Yakbak.Middleware\Yakbak.Middleware.csproj", "{198BB0E8-8103-4949-B3F3-6ADD9CFDA8D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yakbak.Middleware", "src\Yakbak.Middleware\Yakbak.Middleware.csproj", "{198BB0E8-8103-4949-B3F3-6ADD9CFDA8D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

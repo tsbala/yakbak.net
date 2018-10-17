@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Yakbak.Middleware\Yakbak.Middleware.csproj" />
+    <ProjectReference Include="..\Yakbak.Middleware\Yakbak.Middleware.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Yakbak.Middleware.Extensions
 {
@@ -45,6 +47,7 @@ namespace Yakbak.Middleware.Extensions
             {
                 throw new ArgumentNullException(nameof(context));
             }
+
             if (destinationUri == null)
             {
                 throw new ArgumentNullException(nameof(destinationUri));
@@ -59,15 +62,16 @@ namespace Yakbak.Middleware.Extensions
             }
         }
 
-        public static Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context, HttpRequestMessage requestMessage)
+        public static Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context,
+            HttpRequestMessage requestMessage)
         {
             if (requestMessage == null)
             {
                 throw new ArgumentNullException(nameof(requestMessage));
             }
 
-            var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
-            return client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
+            var yakbakService = context.RequestServices.GetRequiredService<YakbakService>();
+            return yakbakService.Client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
         }
 
         public static async Task CopyProxyHttpResponse(this HttpContext context, HttpResponseMessage responseMessage)
@@ -79,7 +83,7 @@ namespace Yakbak.Middleware.Extensions
 
             var response = context.Response;
 
-            response.StatusCode = (int)responseMessage.StatusCode;
+            response.StatusCode = (int) responseMessage.StatusCode;
             foreach (var header in responseMessage.Headers)
             {
                 response.Headers[header.Key] = header.Value.ToArray();
@@ -92,12 +96,10 @@ namespace Yakbak.Middleware.Extensions
 
             // SendAsync removes chunking from the response. This removes the header so it doesn't expect a chunked response.
             response.Headers.Remove("transfer-encoding");
-
-            using (var responseStream = await responseMessage.Content.ReadAsStreamAsync())
-            {
-                const int streamCopyBufferSize = 81920;
-                await responseStream.CopyToAsync(response.Body, streamCopyBufferSize, context.RequestAborted);
-            }
+            
+            // read the Content as a byte[] and write it to the response Body
+            var responseArray = await responseMessage.Content.ReadAsByteArrayAsync();
+            await response.Body.WriteAsync(responseArray, context.RequestAborted);
         }
     }
 }

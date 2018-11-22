@@ -15,17 +15,17 @@ namespace Yakbak
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOptions();
             services.Configure<YakbakOptions>(Configuration.GetSection("Yakbak"));
+            services.AddYakBak();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseYakbak(app.ApplicationServices.GetService<IOptions<YakbakOptions>>());
+            app.UseYakbak();
         }
     }
 }

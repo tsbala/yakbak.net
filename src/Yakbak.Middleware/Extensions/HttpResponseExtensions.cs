@@ -23,9 +23,8 @@ namespace Yakbak.Middleware.Extensions
             };
 
             using (var buffer = new MemoryStream())
-            using (var responseStream = await response.Content.ReadAsStreamAsync())
             {
-                await responseStream.CopyToAsync(buffer);
+                await response.Content.CopyToAsync(buffer);
                 var bytes = buffer.ReadAllBytes();
                 tapedResponse.Base64Body = Convert.ToBase64String(bytes);
             }

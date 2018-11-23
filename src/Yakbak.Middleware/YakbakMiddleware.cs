@@ -62,11 +62,18 @@ namespace Yakbak.Middleware
                 // replace the Response.Body with the buffer.
                 var stream = context.Response.Body;
                 context.Response.Body = buffer;
+                
+                // Proxy request
                 using (var responseMessage = await context.SendProxyHttpRequest(request))
                 {
+                    // Copy proxy response to the response
                     await context.CopyProxyHttpResponse(responseMessage);
+                    // Save response to tape
                     await responseMessage.SaveToTape(tapename);
                 }
+                
+                // reset to original Response body after copying 
+                // from buffer
                 buffer.Seek(0, SeekOrigin.Begin);
                 await buffer.CopyToAsync(stream);
                 context.Response.Body = stream;

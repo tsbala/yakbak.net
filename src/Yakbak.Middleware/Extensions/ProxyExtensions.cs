@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -39,27 +38,6 @@ namespace Yakbak.Middleware.Extensions
             requestMessage.Method = new HttpMethod(request.Method);
 
             return requestMessage;
-        }
-
-        public static async Task ProxyRequest(this HttpContext context, Uri destinationUri)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (destinationUri == null)
-            {
-                throw new ArgumentNullException(nameof(destinationUri));
-            }
-
-            using (var requestMessage = context.CreateProxyHttpRequest(destinationUri))
-            {
-                using (var responseMessage = await context.SendProxyHttpRequest(requestMessage))
-                {
-                    await context.CopyProxyHttpResponse(responseMessage);
-                }
-            }
         }
 
         public static Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context,
